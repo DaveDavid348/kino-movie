@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="my">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#171313">
+  <meta name="description" content="A simple, static movie library for films you are allowed to watch and share.">
+  <title>ရုပ်ရှင်ခန်းမ | Kino</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+Myanmar:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #171313;
+      --panel: #211b1a;
+      --panel-raised: #2c2321;
+      --paper: #f5eee4;
+      --muted: #b6aaa0;
+      --red: #ee563e;
+      --yellow: #f3c46b;
+      --line: rgba(245, 238, 228, .13);
+      font-family: "DM Sans", "Noto Sans Myanmar", sans-serif;
+      background: var(--ink);
+      color: var(--paper);
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; background: var(--ink); }
+    button, input, select { font: inherit; }
+    button { color: inherit; }
+    a { color: inherit; }
+    .shell { width: min(1440px, 100% - 64px); margin-inline: auto; }
+    .topbar { height: 78px; display: flex; align-items: center; gap: 42px; border-bottom: 1px solid var(--line); }
+    .brand { display: inline-flex; align-items: center; gap: 11px; color: var(--paper); text-decoration: none; font-weight: 700; white-space: nowrap; }
+    .brand-mark { width: 34px; height: 34px; display: grid; place-items: center; color: var(--ink); background: var(--yellow); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+    .brand-mark svg { width: 15px; height: 15px; margin-left: 2px; }
+    .brand-name { font-size: 17px; }
+    .brand-name span { display: block; color: var(--muted); font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; }
+    .nav { display: flex; gap: 26px; align-items: center; height: 100%; }
+    .nav button { height: 100%; border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--muted); cursor: pointer; font-size: 14px; }
+    .nav button.active, .nav button:hover { color: var(--paper); border-bottom-color: var(--red); }
+    .top-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+    .search { width: min(250px, 24vw); position: relative; }
+    .search svg { width: 17px; height: 17px; position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+    .search input { width: 100%; height: 40px; padding: 0 13px 0 39px; border: 1px solid var(--line); border-radius: 4px; outline: none; color: var(--paper); background: #201b1a; font-size: 13px; }
+    .search input:focus { border-color: var(--yellow); }
+    .icon-button, .add-button, .primary-button, .quiet-button { display: inline-flex; align-items: center; justify-content: center; gap: 9px; cursor: pointer; transition: background .2s, transform .2s, border-color .2s; }
+    .icon-button { width: 40px; height: 40px; border: 1px solid var(--line); border-radius: 4px; background: transparent; }
+    .icon-button:hover { border-color: var(--yellow); }
+    .icon-button svg, .add-button svg, .primary-button svg, .quiet-button svg { width: 17px; height: 17px; flex: 0 0 auto; }
+    .add-button { height: 40px; padding: 0 14px; border: 0; border-radius: 4px; background: var(--yellow); color: #241a12; font-size: 13px; font-weight: 700; text-decoration: none; }
+    .add-button:hover, .primary-button:hover { transform: translateY(-1px); }
+    .hero { min-height: 462px; margin-top: 30px; position: relative; display: flex; align-items: end; overflow: hidden; background: #38241e; isolation: isolate; }
+    .hero::before { content: ""; position: absolute; z-index: -2; inset: 0; background: url("https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=2000&q=85") center 48% / cover; }
+    .hero::after { content: ""; position: absolute; z-index: -1; inset: 0; background: linear-gradient(90deg, rgba(19, 14, 13, .94) 0%, rgba(19, 14, 13, .73) 42%, rgba(19, 14, 13, .09) 100%), linear-gradient(0deg, rgba(19, 14, 13, .57), transparent 45%); }
+    .hero-copy { width: min(610px, 100%); padding: 54px 58px 58px; }
+    .eyebrow { display: flex; align-items: center; gap: 10px; color: var(--yellow); font-size: 11px; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; }
+    .eyebrow::before { content: ""; width: 24px; height: 2px; background: var(--red); }
+    .hero h1 { margin: 17px 0 11px; font-size: clamp(34px, 4vw, 55px); line-height: 1.15; letter-spacing: 0; }
+    .hero-meta { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; color: #dfd1c3; font-size: 13px; }
+    .rating { color: var(--yellow); font-weight: 700; }
+    .hero p { max-width: 450px; margin: 18px 0 23px; color: #ded4cb; font-size: 14px; line-height: 1.8; }
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .primary-button, .quiet-button { min-height: 44px; padding: 0 17px; border-radius: 4px; font-size: 13px; font-weight: 700; }
+    .primary-button { border: 0; background: var(--red); color: #fff8f1; }
+    .quiet-button { border: 1px solid rgba(255,255,255,.38); background: rgba(23,19,19,.28); }
+    .quiet-button:hover { border-color: var(--yellow); background: rgba(23,19,19,.55); }
+    .content { padding: 40px 0 60px; }
+    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 19px; }
+    .section-head h2 { margin: 0; font-size: 23px; letter-spacing: 0; }
+    .section-head p { margin: 6px 0 0; color: var(--muted); font-size: 12px; }
+    .filters { display: flex; gap: 7px; overflow: auto; scrollbar-width: none; }
+    .filters::-webkit-scrollbar { display: none; }
+    .filter { min-height: 33px; padding: 0 13px; border: 1px solid var(--line); border-radius: 20px; background: transparent; color: var(--muted); cursor: pointer; white-space: nowrap; font-size: 12px; }
+    .filter:hover, .filter.active { border-color: var(--yellow); background: rgba(243,196,107,.1); color: var(--paper); }
+    .movie-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px 18px; }
+    .movie-card { min-width: 0; animation: rise .45s both; }
+    .poster { aspect-ratio: 2 / 2.75; position: relative; overflow: hidden; background: var(--panel); }
+    .poster img { width: 100%; height: 100%; display: block; object-fit: cover; transition: transform .45s; }
+    .movie-card:hover .poster img { transform: scale(1.04); }
+    .poster::after { content: ""; position: absolute; inset: 45% 0 0; background: linear-gradient(transparent, rgba(16,12,12,.52)); pointer-events: none; }
+    .poster-tag { position: absolute; z-index: 1; top: 11px; left: 11px; padding: 5px 8px; border-radius: 2px; background: var(--yellow); color: #221a12; font-size: 10px; font-weight: 700; }
+    .save-button { position: absolute; z-index: 2; top: 9px; right: 9px; width: 35px; height: 35px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.42); border-radius: 50%; background: rgba(23,19,19,.56); cursor: pointer; }
+    .save-button:hover, .save-button.saved { color: var(--yellow); border-color: var(--yellow); }
+    .save-button svg { width: 17px; height: 17px; }
+    .poster-play { position: absolute; z-index: 1; left: 50%; top: 50%; width: 46px; height: 46px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.7); border-radius: 50%; background: rgba(238,86,62,.88); opacity: 0; transform: translate(-50%,-40%); transition: opacity .2s, transform .2s; cursor: pointer; }
+    .movie-card:hover .poster-play, .poster-play:focus-visible { opacity: 1; transform: translate(-50%,-50%); }
+    .poster-play svg { width: 17px; height: 17px; margin-left: 2px; }
+    .movie-info { display: flex; justify-content: space-between; align-items: start; gap: 10px; padding-top: 12px; }
+    .movie-info h3 { margin: 0; overflow: hidden; color: var(--paper); font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
+    .movie-info p { margin: 6px 0 0; color: var(--muted); font-size: 11px; }
+    .movie-rating { flex: 0 0 auto; color: var(--yellow); font-size: 11px; font-weight: 700; }
+    .empty-state { grid-column: 1 / -1; padding: 48px 15px; color: var(--muted); text-align: center; }
+    footer { padding: 18px 0 28px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; }
+    .footer-inner { display: flex; justify-content: space-between; gap: 18px; }
+    dialog { width: min(720px, calc(100% - 28px)); max-height: min(90vh, 900px); padding: 0; overflow: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--paper); }
+    dialog::backdrop { background: rgba(9,7,7,.83); backdrop-filter: blur(5px); }
+    .dialog-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 17px 20px; border-bottom: 1px solid var(--line); }
+    .dialog-head h2 { margin: 0; font-size: 17px; }
+    .close-button { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 4px; background: transparent; cursor: pointer; }
+    .close-button:hover { border-color: var(--yellow); }
+    .close-button svg { width: 17px; height: 17px; }
+    .player-wrap { aspect-ratio: 16 / 9; background: #080707; }
+    .player-wrap iframe { width: 100%; height: 100%; border: 0; }
+    .source-watch { min-height: 100%; display: flex; align-items: center; justify-content: center; color: var(--yellow); font-size: 15px; font-weight: 700; text-decoration: none; }
+    .source-watch:hover { color: var(--paper); }
+    .player-info { padding: 18px 20px 21px; }
+    .player-info h3 { margin: 0 0 8px; font-size: 20px; }
+    .player-info p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+    .form-body { display: grid; gap: 14px; padding: 20px; }
+    .form-body label { display: grid; gap: 7px; color: #e4d8ce; font-size: 12px; font-weight: 600; }
+    .form-body input, .form-body select { width: 100%; height: 42px; padding: 0 11px; border: 1px solid var(--line); border-radius: 4px; outline: none; background: #171313; color: var(--paper); font-size: 13px; }
+    .form-body input:focus, .form-body select:focus { border-color: var(--yellow); }
+    .form-hint { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
+    .form-error { min-height: 16px; margin: -5px 0 0; color: #ff9b86; font-size: 12px; }
+    .form-submit { justify-self: start; }
+    @keyframes rise { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+    @media (max-width: 900px) {
+      .shell { width: min(100% - 40px, 740px); }
+      .topbar { gap: 22px; }
+      .nav { gap: 15px; }
+      .nav button { font-size: 12px; }
+      .movie-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px 14px; }
+      .hero { min-height: 420px; }
+      .hero-copy { padding: 42px; }
+    }
+    @media (max-width: 620px) {
+      .shell { width: calc(100% - 32px); }
+      .topbar { height: auto; min-height: 67px; flex-wrap: wrap; gap: 0; padding: 11px 0 0; }
+      .brand { margin-right: auto; }
+      .top-actions { margin-left: 0; }
+      .search { width: 40px; transition: width .2s; }
+      .search:focus-within { width: min(190px, 43vw); }
+      .search input { padding-right: 0; color: transparent; cursor: pointer; }
+      .search:focus-within input { padding-right: 10px; color: var(--paper); cursor: text; }
+      .search input::placeholder { color: transparent; }
+      .search:focus-within input::placeholder { color: var(--muted); }
+      .add-button { width: 40px; padding: 0; font-size: 0; }
+      .top-actions { gap: 8px; }
+      .nav { width: 100%; height: 42px; order: 2; justify-content: flex-start; gap: 23px; }
+      .nav button { height: 42px; }
+      .hero { min-height: 430px; margin-top: 19px; }
+      .hero::after { background: linear-gradient(0deg, rgba(19,14,13,.94) 0%, rgba(19,14,13,.65) 49%, rgba(19,14,13,.07) 100%); }
+      .hero-copy { padding: 25px 21px 27px; }
+      .hero h1 { font-size: 34px; }
+      .hero p { font-size: 13px; }
+      .content { padding-top: 31px; }
+      .section-head { align-items: start; flex-direction: column; gap: 14px; }
+      .filters { width: 100%; }
+      .movie-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 23px 12px; }
+      .movie-info h3 { font-size: 13px; }
+      .poster-play { opacity: 1; transform: translate(-50%,-50%); width: 40px; height: 40px; }
+      .footer-inner { flex-direction: column; gap: 7px; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <header class="shell topbar">
+    <a class="brand" href="#home" aria-label="ရုပ်ရှင်ခန်းမ ပင်မစာမျက်နှာ">
+      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.7c0-.8.9-1.3 1.6-.9l9 5.3a1 1 0 0 1 0 1.8l-9 5.3a1 1 0 0 1-1.6-.9V5.7Z"/></svg></span>
+      <span class="brand-name">ရုပ်ရှင်ခန်းမ<span>Kino / Movie library</span></span>
+    </a>
+    <nav class="nav" aria-label="ပင်မမီနူး">
+      <button class="active" type="button" data-view="all">ပင်မစာမျက်နှာ</button>
+      <button type="button" data-view="saved">ကျွန်ုပ်၏စာရင်း <span id="saved-count"></span></button>
+    </nav>
+    <div class="top-actions">
+      <label class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg>
+        <input id="search" type="search" placeholder="ရုပ်ရှင်ရှာရန်..." aria-label="ရုပ်ရှင်ရှာရန်">
+      </label>
+      <a class="add-button" href="https://studio.blender.org/films/" target="_blank" rel="noopener noreferrer" aria-label="Blender တရားဝင်ရုပ်ရှင်စာရင်းဖွင့်ရန်">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/></svg>အခမဲ့ရုပ်ရှင်များ
+      </a>
+    </div>
+  </header>
+
+  <main class="shell" id="home">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <div class="eyebrow">ဒီနေ့ရွေးချယ်မှု</div>
+        <h1 id="hero-title">Big Buck Bunny</h1>
+        <div class="hero-meta"><span>2008</span><span>•</span><span>၁၀ မိနစ်</span><span>•</span><span>ကာတွန်း</span><span class="rating">BLENDER OPEN MOVIE</span></div>
+        <p>အေးအေးဆေးဆေးနေတတ်တဲ့ ယုန်လေး Big Buck Bunny ရဲ့တောအုပ်ထဲကို ဆော့ကစားတတ်တဲ့ ရှဉ့်သုံးကောင် ရောက်လာတဲ့အခါ ဘာတွေဖြစ်မလဲ။</p>
+        <div class="hero-actions">
+          <button class="primary-button" id="hero-play" type="button"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.7c0-.8.9-1.3 1.6-.9l9 5.3a1 1 0 0 1 0 1.8l-9 5.3a1 1 0 0 1-1.6-.9V5.7Z"/></svg>ကြည့်ရန်</button>
+          <button class="quiet-button" id="hero-save" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4.8A1.8 1.8 0 0 1 7.8 3h8.4A1.8 1.8 0 0 1 18 4.8V21l-6-3.8L6 21V4.8Z"/></svg>စာရင်းထဲထည့်ရန်</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="content" aria-labelledby="list-title">
+      <div class="section-head">
+        <div><h2 id="list-title">ရုပ်ရှင်အားလုံး</h2><p id="list-subtitle">ရွေးချယ်ကြည့်ရှုနိုင်သော ရုပ်ရှင်များ</p></div>
+        <div class="filters" role="group" aria-label="ရုပ်ရှင်အမျိုးအစားအလိုက် စစ်ထုတ်ရန်">
+          <button class="filter active" type="button" data-category="all">အားလုံး</button>
+          <button class="filter" type="button" data-category="Animation">ကာတွန်း</button>
+          <button class="filter" type="button" data-category="Adventure">စွန့်စားခန်း</button>
+          <button class="filter" type="button" data-category="Sci-Fi">သိပ္ပံစိတ်ကူးယဉ်</button>
+          <button class="filter" type="button" data-category="Drama">ဒရာမာ</button>
+          <button class="filter" type="button" data-category="Comedy">ဟာသ</button>
+        </div>
+      </div>
+      <div class="movie-grid" id="movie-grid" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer><div class="shell footer-inner"><span>ကြည့်ရှုခွင့်ရှိသော ရုပ်ရှင်လင့်ခ်များကိုသာ အသုံးပြုပါ။</span><span>Static website · အကောင့်၊ server၊ database မလိုပါ</span></div></footer>
+
+  <dialog id="player-dialog" aria-labelledby="player-title">
+    <div class="dialog-head"><h2>ယခုကြည့်ရှုနေသည်</h2><button class="close-button" type="button" data-close="player-dialog" aria-label="ပိတ်ရန်"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
+    <div class="player-wrap" id="player-wrap"></div>
+    <div class="player-info"><h3 id="player-title"></h3><p id="player-description"></p></div>
+  </dialog>
+
+  <script>
+    const starterMovies = [
+      { id: "bbb", title: "Big Buck Bunny", year: 2008, runtime: "၁၀ မိနစ်", category: "Animation", video: "aqz-KE-bpKQ", sourceUrl: "https://studio.blender.org/projects/big-buck-bunny/", poster: "https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=700&q=82", description: "Blender Open Movie တစ်ကားဖြစ်တဲ့ ဒီဟာသအန်နီမေးရှင်းမှာ ယုန်လေး Big Buck Bunny နဲ့ ရှဉ့်သုံးကောင်တို့ရဲ့ ပျော်စရာဇာတ်လမ်းကို ကြည့်ရှုနိုင်ပါတယ်။" },
+      { id: "sintel", title: "Sintel", year: 2010, runtime: "၁၅ မိနစ်", category: "Adventure", video: "eRsGyueVLvQ", sourceUrl: "https://studio.blender.org/projects/sintel/", poster: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=700&q=82", description: "ပျောက်ဆုံးသွားတဲ့ နဂါးငယ်ကို ရှာဖွေဖို့ Sintel ထွက်ခွာလာတဲ့ စိတ်ကူးယဉ်စွန့်စားခန်း။" },
+      { id: "tears-of-steel", title: "Tears of Steel", year: 2012, runtime: "၁၂ မိနစ်", category: "Sci-Fi", video: "R6MlUcmOul8", sourceUrl: "https://studio.blender.org/projects/tears-of-steel/", poster: "https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=700&q=82", description: "အနာဂတ်မြို့တော်မှာ လူသားတွေနဲ့ စက်ရုပ်တွေ ရင်ဆိုင်ကြတဲ့ သိပ္ပံစိတ်ကူးယဉ်ဇာတ်လမ်းတို။" },
+      { id: "caminandes", title: "Caminandes: Llamigos", year: 2016, runtime: "၂ မိနစ်", category: "Animation", sourceUrl: "https://studio.blender.org/projects/caminandes-3/", poster: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=700&q=82", description: "Patagonia ဆောင်းရာသီမှာ လာမာ Koro နဲ့ ပင်ဂွင်း Oti တို့ရဲ့ ဘယ်ရီသီးတစ်လုံးအတွက် အပြိုင်အဆိုင်။" },
+      { id: "coffee-run", title: "Coffee Run", year: 2020, runtime: "၇ မိနစ်", category: "Drama", sourceUrl: "https://studio.blender.org/projects/coffee-run/", poster: "https://images.unsplash.com/photo-1442512595331-e89e73853f31?auto=format&fit=crop&w=700&q=82", description: "အတိတ်က အချစ်ရေးအမှတ်တရတွေကို ဖြတ်သန်းရင်း ကော်ဖီဆိုင်ဆီ အပြေးသွားနေတဲ့ အမျိုးသမီးငယ်တစ်ဦးရဲ့ ဇာတ်လမ်း။" },
+      { id: "spring", title: "Spring", year: 2019, runtime: "၇ မိနစ်", category: "Adventure", sourceUrl: "https://studio.blender.org/projects/spring/", poster: "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&w=700&q=82", description: "သိုးထိန်းမလေး Spring နဲ့ သူ့ခွေးလေးတို့က ရှေးဟောင်းဝိညာဉ်များနဲ့ ရင်ဆိုင်ရတဲ့ ကဗျာဆန်သော စွန့်စားခန်း။" },
+      { id: "glass-half", title: "Glass Half", year: 2015, runtime: "၃ မိနစ်", category: "Comedy", sourceUrl: "https://studio.blender.org/projects/glass-half/", poster: "https://images.unsplash.com/photo-1513558161293-cdaf765edfd7?auto=format&fit=crop&w=700&q=82", description: "အနုပညာပြခန်းမှာ တွေ့ဆုံကြတဲ့ ဝေဖန်ရေးသမားနှစ်ဦးရဲ့ ရယ်စရာအငြင်းအခုံ။" },
+      { id: "cosmos-laundromat", title: "Cosmos Laundromat", year: 2015, runtime: "၁၂ မိနစ်", category: "Sci-Fi", sourceUrl: "https://studio.blender.org/projects/cosmos-laundromat/", poster: "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=700&q=82", description: "ကျွန်းပေါ်က သိုးတစ်ကောင်ရဲ့ ကံကြမ္မာကို ပြောင်းလဲပေးနိုင်တဲ့ လျှို့ဝှက်ဆန်းကြယ်သူစိမ်းတစ်ဦး။" }
+    ];
+    const savedKey = "kino-saved-movies-v1";
+    let savedMovies = readStorage(savedKey, []);
+    let activeCategory = "all";
+    let currentView = "all";
+    const grid = document.querySelector("#movie-grid");
+    const searchInput = document.querySelector("#search");
+    const playerDialog = document.querySelector("#player-dialog");
+
+    function readStorage(key, fallback) {
+      try {
+        const value = JSON.parse(localStorage.getItem(key));
+        return Array.isArray(value) ? value : fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    function allMovies() {
+      return starterMovies;
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
+    }
+
+    function categoryName(category) {
+      return ({ Animation: "ကာတွန်း", Adventure: "စွန့်စားခန်း", "Sci-Fi": "သိပ္ပံစိတ်ကူးယဉ်", Drama: "ဒရာမာ", Comedy: "ဟာသ", Documentary: "မှတ်တမ်းရုပ်ရှင်" })[category] || category;
+    }
+
+    function render() {
+      const query = searchInput.value.trim().toLocaleLowerCase();
+      const movies = allMovies().filter(movie => {
+        const matchesQuery = `${movie.title} ${movie.category} ${movie.year || ""}`.toLocaleLowerCase().includes(query);
+        const matchesCategory = activeCategory === "all" || movie.category === activeCategory;
+        const matchesView = currentView !== "saved" || savedMovies.includes(movie.id);
+        return matchesQuery && matchesCategory && matchesView;
+      });
+      document.querySelector("#list-title").textContent = currentView === "saved" ? "ကျွန်ုပ်၏စာရင်း" : "ရုပ်ရှင်အားလုံး";
+      document.querySelector("#list-subtitle").textContent = currentView === "saved" ? `${movies.length} ကား သိမ်းထားသည်` : "ရွေးချယ်ကြည့်ရှုနိုင်သော ရုပ်ရှင်များ";
+      document.querySelector("#saved-count").textContent = savedMovies.length ? `(${savedMovies.length})` : "";
+      grid.innerHTML = movies.length ? movies.map((movie, index) => `
+        <article class="movie-card" style="animation-delay:${Math.min(index * 45, 270)}ms">
+          <div class="poster">
+            <img src="${escapeHtml(movie.poster || "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=700&q=82")}" alt="${escapeHtml(movie.title)} ပိုစတာ" loading="lazy">
+            <span class="poster-tag">${escapeHtml(categoryName(movie.category))}</span>
+            <button class="save-button ${savedMovies.includes(movie.id) ? "saved" : ""}" type="button" data-save="${escapeHtml(movie.id)}" aria-label="${savedMovies.includes(movie.id) ? "စာရင်းမှဖယ်ရန်" : "စာရင်းထဲထည့်ရန်"}" title="${savedMovies.includes(movie.id) ? "စာရင်းမှဖယ်ရန်" : "စာရင်းထဲထည့်ရန်"}">
+              <svg viewBox="0 0 24 24" fill="${savedMovies.includes(movie.id) ? "currentColor" : "none"}" stroke="currentColor" stroke-width="1.8"><path d="M6 4.8A1.8 1.8 0 0 1 7.8 3h8.4A1.8 1.8 0 0 1 18 4.8V21l-6-3.8L6 21V4.8Z"/></svg>
+            </button>
+            <button class="poster-play" type="button" data-play="${escapeHtml(movie.id)}" aria-label="${escapeHtml(movie.title)} ကြည့်ရန်"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.7c0-.8.9-1.3 1.6-.9l9 5.3a1 1 0 0 1 0 1.8l-9 5.3a1 1 0 0 1-1.6-.9V5.7Z"/></svg></button>
+          </div>
+          <div class="movie-info"><div><h3 title="${escapeHtml(movie.title)}">${escapeHtml(movie.title)}</h3><p>${escapeHtml(movie.year || "")}${movie.year ? " · " : ""}${escapeHtml(movie.runtime || "ရုပ်ရှင်")}</p></div><span class="movie-rating">OPEN</span></div>
+        </article>`).join("") : `<div class="empty-state">${currentView === "saved" ? "သိမ်းထားသော ရုပ်ရှင်မရှိသေးပါ။" : "ကိုက်ညီသော ရုပ်ရှင်မတွေ့ပါ။"}</div>`;
+    }
+
+    function toggleSaved(id) {
+      savedMovies = savedMovies.includes(id) ? savedMovies.filter(savedId => savedId !== id) : [...savedMovies, id];
+      localStorage.setItem(savedKey, JSON.stringify(savedMovies));
+      updateHeroSave();
+      render();
+    }
+
+    function updateHeroSave() {
+      const isSaved = savedMovies.includes("bbb");
+      document.querySelector("#hero-save").innerHTML = `<svg viewBox="0 0 24 24" fill="${isSaved ? "currentColor" : "none"}" stroke="currentColor" stroke-width="1.8"><path d="M6 4.8A1.8 1.8 0 0 1 7.8 3h8.4A1.8 1.8 0 0 1 18 4.8V21l-6-3.8L6 21V4.8Z"/></svg>${isSaved ? "စာရင်းမှဖယ်ရန်" : "စာရင်းထဲထည့်ရန်"}`;
+    }
+
+    function playMovie(id) {
+      const movie = allMovies().find(item => item.id === id);
+      if (!movie) return;
+      document.querySelector("#player-title").textContent = movie.title;
+      document.querySelector("#player-description").textContent = movie.description || "";
+      const frame = document.createElement("iframe");
+      if (!movie.video) {
+        const sourceLink = document.createElement("a");
+        sourceLink.className = "source-watch";
+        sourceLink.href = movie.sourceUrl;
+        sourceLink.target = "_blank";
+        sourceLink.rel = "noopener noreferrer";
+        sourceLink.textContent = "တရားဝင်ရုပ်ရှင်ကို ကြည့်ရန်";
+        document.querySelector("#player-wrap").replaceChildren(sourceLink);
+        playerDialog.showModal();
+        return;
+      }
+      frame.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(movie.video)}?autoplay=1&rel=0`;
+      frame.title = `${movie.title} video player`;
+      frame.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+      frame.allowFullscreen = true;
+      const playerWrap = document.querySelector("#player-wrap");
+      playerWrap.replaceChildren(frame);
+      playerDialog.showModal();
+    }
+
+    document.querySelectorAll("[data-close]").forEach(button => button.addEventListener("click", () => document.getElementById(button.dataset.close).close()));
+    [playerDialog].forEach(dialog => dialog.addEventListener("click", event => {
+      if (event.target === dialog) dialog.close();
+    }));
+    playerDialog.addEventListener("close", () => document.querySelector("#player-wrap").replaceChildren());
+    document.querySelector("#hero-play").addEventListener("click", () => playMovie("bbb"));
+    document.querySelector("#hero-save").addEventListener("click", () => toggleSaved("bbb"));
+    searchInput.addEventListener("input", render);
+    grid.addEventListener("click", event => {
+      const saveButton = event.target.closest("[data-save]");
+      const playButton = event.target.closest("[data-play]");
+      if (saveButton) toggleSaved(saveButton.dataset.save);
+      if (playButton) playMovie(playButton.dataset.play);
+    });
+    document.querySelectorAll("[data-category]").forEach(button => button.addEventListener("click", () => {
+      activeCategory = button.dataset.category;
+      document.querySelectorAll("[data-category]").forEach(filter => filter.classList.toggle("active", filter === button));
+      render();
+    }));
+    document.querySelectorAll("[data-view]").forEach(button => button.addEventListener("click", () => {
+      currentView = button.dataset.view;
+      document.querySelectorAll("[data-view]").forEach(tab => tab.classList.toggle("active", tab === button));
+      render();
+    }));
+    updateHeroSave();
+    render();
+  </script>
+</body>
+</html>
