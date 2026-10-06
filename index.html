@@ -94,6 +94,9 @@
     .movie-info p { margin: 6px 0 0; color: var(--muted); font-size: 11px; }
     .movie-rating { flex: 0 0 auto; color: var(--yellow); font-size: 11px; font-weight: 700; }
     .empty-state { grid-column: 1 / -1; padding: 48px 15px; color: var(--muted); text-align: center; }
+    .empty-state p { margin: 0 0 14px; line-height: 1.7; }
+    .availability-link { display: inline-flex; min-height: 40px; align-items: center; justify-content: center; padding: 0 14px; border: 1px solid var(--yellow); border-radius: 4px; color: var(--yellow); font-size: 13px; font-weight: 700; text-decoration: none; }
+    .availability-link:hover { background: rgba(243,196,107,.1); }
     .pagination { display: flex; align-items: center; justify-content: center; gap: 18px; margin-top: 28px; color: var(--muted); font-size: 12px; }
     .page-button { min-height: 36px; padding: 0 13px; border: 1px solid var(--line); border-radius: 4px; background: transparent; cursor: pointer; }
     .page-button:hover:not(:disabled) { border-color: var(--yellow); color: var(--paper); }
@@ -305,7 +308,7 @@
             <button class="poster-play" type="button" data-play="${escapeHtml(movie.id)}" aria-label="${escapeHtml(movie.title)} ကြည့်ရန်"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.7c0-.8.9-1.3 1.6-.9l9 5.3a1 1 0 0 1 0 1.8l-9 5.3a1 1 0 0 1-1.6-.9V5.7Z"/></svg></button>
           </div>
           <div class="movie-info"><div><h3 title="${escapeHtml(movie.title)}">${escapeHtml(movie.title)}</h3><p>${escapeHtml(movie.year || "")}${movie.year ? " · " : ""}${escapeHtml(movie.runtime || "ရုပ်ရှင်")}</p></div><span class="movie-rating">${movie.licenseUrl ? "PD / CC" : "OPEN"}</span></div>
-        </article>`).join("") : `<div class="empty-state">${currentView === "saved" ? "သိမ်းထားသော ရုပ်ရှင်မရှိသေးပါ။" : currentView === "archive" && archiveLoading ? "Archive.org မှ ရုပ်ရှင်များ ရှာနေသည်..." : currentView === "archive" && archiveError ? `Archive.org ကို ချိတ်ဆက်မရပါ။ <button class="quiet-button" id="retry-search" type="button">ထပ်ရှာရန်</button>` : "ကိုက်ညီသော ရုပ်ရှင်မတွေ့ပါ။"}</div>`;
+        </article>`).join("") : `<div class="empty-state">${currentView === "saved" ? "သိမ်းထားသော ရုပ်ရှင်မရှိသေးပါ။" : currentView === "archive" && archiveLoading ? "Archive.org မှ ရုပ်ရှင်များ ရှာနေသည်..." : currentView === "archive" && archiveError ? `Archive.org ကို ချိတ်ဆက်မရပါ။ <button class="quiet-button" id="retry-search" type="button">ထပ်ရှာရန်</button>` : currentView === "archive" && query ? `<p>“${escapeHtml(searchInput.value.trim())}” ကို အခမဲ့လိုင်စင်ဖော်ပြထားသော ရုပ်ရှင်စာရင်းထဲမှာ မတွေ့ပါ။ တရားဝင်ကြည့်ရှုနိုင်သည့်နေရာကို ရှာပါ။</p><a class="availability-link" href="https://www.justwatch.com/th/search?q=${encodeURIComponent(searchInput.value.trim())}" target="_blank" rel="noopener noreferrer">တရားဝင် streaming ဝန်ဆောင်မှုရှာရန် ↗</a><p style="margin-top:12px;font-size:11px">ဤ link သည် Thailand ဝန်ဆောင်မှုများကို အရင်ပြပါမည်။ အခြားနိုင်ငံ၏ ရရှိနိုင်မှုကို JustWatch တွင် ပြောင်းရွေးနိုင်သည်။</p>` : "ကိုက်ညီသော ရုပ်ရှင်မတွေ့ပါ။"}</div>`;
     }
 
     async function loadArchivePage(page = 1) {
