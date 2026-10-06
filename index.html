@@ -114,6 +114,9 @@
     .player-info { padding: 18px 20px 21px; }
     .player-info h3 { margin: 0 0 8px; font-size: 20px; }
     .player-info p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+    .source-details { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 12px !important; }
+    .source-details a { color: var(--yellow); font-size: 12px; }
+    .source-details a:hover { color: var(--paper); }
     .form-body { display: grid; gap: 14px; padding: 20px; }
     .form-body label { display: grid; gap: 7px; color: #e4d8ce; font-size: 12px; font-weight: 600; }
     .form-body input, .form-body select { width: 100%; height: 42px; padding: 0 11px; border: 1px solid var(--line); border-radius: 4px; outline: none; background: #171313; color: var(--paper); font-size: 13px; }
@@ -224,7 +227,7 @@
   <dialog id="player-dialog" aria-labelledby="player-title">
     <div class="dialog-head"><h2>ယခုကြည့်ရှုနေသည်</h2><button class="close-button" type="button" data-close="player-dialog" aria-label="ပိတ်ရန်"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
     <div class="player-wrap" id="player-wrap"></div>
-    <div class="player-info"><h3 id="player-title"></h3><p id="player-description"></p></div>
+    <div class="player-info"><h3 id="player-title"></h3><p id="player-description"></p><p class="source-details"><a id="player-source" target="_blank" rel="noopener noreferrer">မူရင်းရုပ်ရှင်မှတ်တမ်း</a><a id="player-license" target="_blank" rel="noopener noreferrer" hidden>လိုင်စင်အချက်အလက်</a></p></div>
   </dialog>
 
   <script>
@@ -377,6 +380,12 @@
       if (!movie) return;
       document.querySelector("#player-title").textContent = movie.title;
       document.querySelector("#player-description").textContent = movie.description || "";
+      const sourceLink = document.querySelector("#player-source");
+      sourceLink.href = movie.sourceUrl;
+      sourceLink.textContent = movie.archive ? "Archive.org မူရင်းမှတ်တမ်း" : "Blender Studio မူရင်းစာမျက်နှာ";
+      const licenseLink = document.querySelector("#player-license");
+      licenseLink.hidden = !movie.licenseUrl;
+      if (movie.licenseUrl) licenseLink.href = movie.licenseUrl;
       const frame = document.createElement("iframe");
       if (movie.archive) {
         frame.src = `https://archive.org/embed/${encodeURIComponent(movie.id)}`;
